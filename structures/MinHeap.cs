@@ -1,4 +1,4 @@
-namespace Structures.BinaryHeap
+namespace GatorLibrary.Structures.BinaryHeap
 {
     public class Node<T>
     {
@@ -111,20 +111,21 @@ namespace Structures.BinaryHeap
             }
         }
 
-        public void RemoveMin()
+        public Node<T> RemoveMin()
         {
             if (Nodes.Count == 0)
             {
-                Console.WriteLine("No node exists to delete.");
-                return;
+                throw new InvalidOperationException("Heap does not contain any nodes.");
             }
+            Node<T> min = Nodes[0];
             Nodes[0] = Nodes[Nodes.Count - 1];
             Nodes = Nodes.Skip(1).ToList();
             if (Nodes.Count == 1)
             {
-                return;
+                return min;
             }
             Heapify();
+            return min;
         }
 
     }
