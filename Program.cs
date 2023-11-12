@@ -1,4 +1,6 @@
-﻿using Structures.BinaryHeap;
+﻿using GatorLibrary;
+using GatorLibrary.Structures.BinaryHeap;
+using GatorLibrary.Structures.RedBlackTree;
 
 MinBinaryHeap<string> heap = new(null);
 heap.Add("patron 1", 1);
@@ -16,3 +18,43 @@ heap.RemoveMin();
 Console.WriteLine(heap.GetHeapData());
 heap.RemoveMin();
 
+
+RedBlackTree<int> redBlackTree = new(null);
+redBlackTree.Insert(10);
+redBlackTree.Insert(18);
+redBlackTree.Insert(7);
+redBlackTree.Insert(15);
+redBlackTree.Insert(16);
+redBlackTree.Insert(30);
+redBlackTree.Insert(24);
+redBlackTree.Insert(40);
+redBlackTree.Insert(60);
+redBlackTree.Insert(2);
+redBlackTree.Insert(1);
+var v = redBlackTree.Delete(10);
+redBlackTree.Delete(15);
+redBlackTree.Delete(7);
+redBlackTree.Delete(40);
+Console.WriteLine(redBlackTree.Root);
+redBlackTree.SearchClosest(20).ForEach(n => Console.WriteLine(n));
+
+Library gatorLibrary = new();
+gatorLibrary.InsertBook(1, "Book1", "Author1", "Yes");
+// Console.WriteLine(gatorLibrary.PrintBook(1));
+gatorLibrary.InsertBook(2, "Book2", "Author2", "Yes");
+gatorLibrary.InsertBook(3, "Book3", "Author3", "Yes");
+// Console.WriteLine(gatorLibrary.PrintBook(3));
+// Console.WriteLine(gatorLibrary.PrintBooks(-10, 10));
+Console.WriteLine(gatorLibrary.BorrowBook(1, 1, 10));
+Console.WriteLine(gatorLibrary.BorrowBook(2, 1, 15));
+Console.WriteLine(gatorLibrary.BorrowBook(3, 1, 1));
+Console.WriteLine(gatorLibrary.BorrowBook(4, 1, 3));
+Console.WriteLine(gatorLibrary.BorrowBook(5, 1, 2));
+Console.WriteLine(gatorLibrary.DeleteBook(1));
+Console.WriteLine(gatorLibrary.ReturnBook(1, 1));
+Console.WriteLine(gatorLibrary.ReturnBook(3, 1));
+
+gatorLibrary.InsertBook(15, "Book16", "Author1", "Yes");
+gatorLibrary.InsertBook(28, "Book28", "Author2", "Yes");
+gatorLibrary.InsertBook(24, "Book24", "Author3", "Yes");
+Console.WriteLine(gatorLibrary.FindClosestBook(20));
