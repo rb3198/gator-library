@@ -132,10 +132,396 @@ namespace GatorLibrary.Structures.RedBlackTree
             return SearchClosest(Root, new(), searchValue).Select(node => node.Data).ToList();
         }
 
+        public T Delete(T data)
+        {
+            List<Node<T>> vPath = SearchTreeWithPath(data);
+            Node<T> v = vPath[vPath.Count - 1];
+            List<Node<T>>? uPath = BstReplace(v);
+            Node<T>? u = uPath.Count == 0 ? null : uPath[uPath.Count - 1];
+            // True when both u & v are black
+            bool uvBlack = (u == null || u.Color == NodeColor.Black) && v.Color == NodeColor.Black;
+            T deletedData = v.Data;
+            Node<T>? vSibling = GetSibling(vPath);
+            Node<T>? vParent = GetParent(vPath);
+            if (u == null)
+            {
+                // u  is null, i.e. v is a leaf.
+                if (v == Root)
+                {
+                    Root = null;
+                }
+                else
+                {
+                    if (uvBlack)
+                    {
+                        FixDoubleBlack(vPath);
+                    }
+                    else if (vSibling != null)
+                    {
+                        // Make sibling red
+                        vSibling.Color = NodeColor.Red;
+                    }
+                    if (vParent != null)
+                    {
+                        if (v == vParent.Left)
+                        {
+                            vParent.Left = null;
+                        }
+                        else
+                        {
+                            vParent.Right = null;
+                        }
+                    }
+                }
+                return v.Data;
+            }
+
+            if (v.Left == null || v.Right == null)
+            {
+                // v has 1 child
+                if (v == Root)
+                {
+                    // assign u to v, delete v
+                    v.Data = u.Data;
+                    v.Left = v.Right = null;
+                    // delete u
+                }
+                else
+                {
+                    // Detach v from tree and move u up
+                    if (vParent != null)
+                    {
+                        if (vParent.Left == v)
+                            vParent.Left = u;
+                        else
+                            vParent.Right = u;
+                        uPath = SearchTreeWithPath(u.Data);
+                    }
+
+                    if (uvBlack)
+                    {
+                        // u and v both black, fix double black at u
+                        FixDoubleBlack(uPath);
+                    }
+                    else
+                    {
+                        // u or v red, color u black
+                        u.Color = NodeColor.Black;
+                    }
+                }
+                return deletedData;
+            }
+            SwapValues(u, v);
+            var ptr = v.Right;
+            while (ptr != null)
+            {
+                vPath.Add(ptr);
+                ptr = ptr.Left;
+            }
+            Delete(vPath);
+            return deletedData;
+        }
         #endregion
 
         #region Helper methods
 
+        private T Delete(List<Node<T>> vPath)
+        {
+            Node<T> v = vPath[vPath.Count - 1];
+            List<Node<T>>? uPath = BstReplace(v);
+            Node<T>? u = uPath.Count == 0 ? null : uPath[uPath.Count - 1];
+            // True when both u & v are black
+            bool uvBlack = (u == null || u.Color == NodeColor.Black) && v.Color == NodeColor.Black;
+            T deletedData = v.Data;
+            Node<T>? vSibling = GetSibling(vPath);
+            Node<T>? vParent = GetParent(vPath);
+            if (u == null)
+            {
+                // u  is null, i.e. v is a leaf.
+                if (v == Root)
+                {
+                    Root = null;
+                }
+                else
+                {
+                    if (uvBlack)
+                    {
+                        FixDoubleBlack(vPath);
+                    }
+                    else if (vSibling != null)
+                    {
+                        // Make sibling red
+                        vSibling.Color = NodeColor.Red;
+                    }
+                    if (vParent != null)
+                    {
+                        if (v == vParent.Left)
+                        {
+                            vParent.Left = null;
+                        }
+                        else
+                        {
+                            vParent.Right = null;
+                        }
+                    }
+                }
+                return v.Data;
+            }
+
+            if (v.Left == null || v.Right == null)
+            {
+                // v has 1 child
+                if (v == Root)
+                {
+                    // assign u to v, delete v
+                    v.Data = u.Data;
+                    v.Left = v.Right = null;
+                    // delete u
+                }
+                else
+                {
+                    // Detach v from tree and move u up
+                    if (vParent != null)
+                    {
+                        if (vParent.Left == v)
+                            vParent.Left = u;
+                        else
+                            vParent.Right = u;
+                        uPath = SearchTreeWithPath(u.Data);
+                    }
+
+                    if (uvBlack)
+                    {
+                        // u and v both black, fix double black at u
+                        FixDoubleBlack(uPath);
+                    }
+                    else
+                    {
+                        // u or v red, color u black
+                        u.Color = NodeColor.Black;
+                    }
+                }
+                return deletedData;
+            }
+            SwapValues(u, v);
+            Delete(u.Data);
+            return deletedData;
+        }
+
+        private void FixDoubleBlack(List<Node<T>> pathToNode)
+        {
+            // Reached root
+            if (pathToNode.Count == 1)
+                return;
+            Node<T>? sibling = GetSibling(pathToNode), parent = GetParent(pathToNode), grandparent = GetGrandparent(pathToNode);
+            if (parent == null)
+            {
+                return;
+            }
+
+            Node<T> newParent;
+            if (sibling == null)
+            {
+                // No sibling, double black pushed up
+                FixDoubleBlack(pathToNode.SkipLast(1).ToList());
+            }
+            else
+            {
+                if (sibling.Color == NodeColor.Red)
+                {
+                    if (sibling == parent.Left)
+                    {
+                        // left case
+                        newParent = LLRotation(parent);
+                    }
+                    else
+                    {
+                        // right case
+                        newParent = RRRotation(parent);
+                    }
+                    if (grandparent != null)
+                    {
+                        AssignRotatedNode(grandparent, parent, newParent);
+                    }
+                    FixDoubleBlack(pathToNode);
+                }
+                else
+                {
+                    // Sibling black
+                    if (HasRedChild(sibling))
+                    {
+                        // at least 1 red child
+                        if (sibling.Left != null && sibling.Left.Color == NodeColor.Red)
+                        {
+                            if (sibling == parent.Left)
+                            {
+                                // left left
+                                if (sibling.Left != null)
+                                {
+                                    sibling.Left.Color = sibling.Color;
+                                }
+                                newParent = LLRotation(parent);
+                            }
+                            else
+                            {
+                                // left right
+                                if (sibling.Left != null)
+                                {
+                                    sibling.Left.Color = parent.Color;
+                                }
+                                newParent = LRRotation(parent);
+                            }
+                        }
+                        else
+                        {
+                            if (sibling == parent.Left)
+                            {
+                                // left right
+                                if (sibling.Right != null)
+                                {
+                                    sibling.Right.Color = parent.Color;
+                                }
+                                newParent = LRRotation(parent);
+                            }
+                            else
+                            {
+                                // Right Right
+                                if (sibling.Right != null)
+                                {
+                                    sibling.Right.Color = sibling.Color;
+                                }
+                                newParent = RRRotation(parent);
+                            }
+                        }
+                        parent.Color = NodeColor.Black;
+                        if (grandparent != null)
+                        {
+                            AssignRotatedNode(grandparent, parent, newParent);
+                        }
+                    }
+                    else
+                    {
+                        // 2 black children
+                        sibling.Color = NodeColor.Red;
+                        if (parent.Color == NodeColor.Black)
+                            FixDoubleBlack(pathToNode.SkipLast(1).ToList());
+                        else
+                            parent.Color = NodeColor.Black;
+                    }
+                }
+            }
+        }
+
+        private static bool HasRedChild(Node<T> node)
+        {
+            return node.Left?.Color == NodeColor.Red || node.Right?.Color == NodeColor.Red;
+        }
+        private static void SwapValues(Node<T> u, Node<T> v)
+        {
+            (v.Data, u.Data) = (u.Data, v.Data);
+        }
+
+        // Given a path to node, return its sibling
+        private static Node<T>? GetSibling(List<Node<T>> pathToNode)
+        {
+            if (pathToNode.Count <= 1)
+            {
+                return null;
+            }
+            Node<T> node = pathToNode[pathToNode.Count - 1];
+            Node<T> parent = pathToNode[pathToNode.Count - 2];
+            return node == parent.Right ? parent.Left : parent.Right;
+        }
+
+        // Given a path to node, return its parent
+        private static Node<T>? GetParent(List<Node<T>> pathToNode)
+        {
+            if (pathToNode.Count <= 1)
+            {
+                return null;
+            }
+            return pathToNode[pathToNode.Count - 2];
+        }
+
+        private static Node<T>? GetGrandparent(List<Node<T>> pathToNode)
+        {
+            if (pathToNode.Count <= 2)
+            {
+                return null;
+            }
+            return pathToNode[pathToNode.Count - 3];
+        }
+
+        // Returns the entire path to the node with search value.
+        private List<Node<T>> SearchTreeWithPath(T searchValue)
+        {
+            if (Root == null)
+            {
+                throw new ApplicationException("Tree has not been initialized");
+            }
+            List<Node<T>> path = new();
+            Node<T>? ptr = Root;
+            while (ptr != null)
+            {
+                path.Add(ptr);
+                if (ptr.Data.CompareTo(searchValue) == 0)
+                {
+                    return path;
+                }
+                if (searchValue.CompareTo(ptr.Data) < 0)
+                {
+                    ptr = ptr.Left;
+                }
+                else
+                {
+                    ptr = ptr.Right;
+                }
+            }
+            throw new KeyNotFoundException($"Could not find value {searchValue} in the tree");
+        }
+
+        private static List<Node<T>?> FindMinChildPath(Node<T> root)
+        {
+            // Find the child of root with minimum value
+            List<Node<T>?> path = new();
+            Node<T> ptr = root;
+            while (ptr.Left != null)
+            {
+                path.Add(ptr);
+                ptr = ptr.Left;
+            }
+            path.Add(ptr);
+            return path;
+        }
+
+        private static List<Node<T>?> BstReplace(Node<T> node)
+        {
+            // When node has 2 children, replace the node with the min node in its right subtree
+            if (node.Left != null && node.Right != null)
+                return FindMinChildPath(node.Right);
+
+            // When node is a leaf node, return null
+            if (node.Left == null && node.Right == null)
+                return new();
+
+            // when single child
+            if (node.Left != null)
+            {
+                return new()
+                {
+                    node,
+                    node.Left,
+                };
+            }
+            else
+            {
+                return new()
+                {
+                    node,
+                    node.Right,
+                };
+            }
+        }
         private static RotationType GetRotationType(Node<T> grandParent, Node<T> parent, Node<T> node)
         {
             if (parent == grandParent.Left)
