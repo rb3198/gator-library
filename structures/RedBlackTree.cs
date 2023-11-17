@@ -360,22 +360,12 @@ namespace GatorLibrary.Structures.RedBlackTree
                             if (sibling == parent.Left)
                             {
                                 // left left
-                                if (sibling.Left != null)
-                                {
-                                    IncrementColorFlipCount(sibling.Left.Color, sibling.Color);
-                                    sibling.Left.Color = sibling.Color;
-                                }
                                 newParent = LLRotation(parent);
                             }
                             else
                             {
-                                // left right
-                                if (sibling.Left != null)
-                                {
-                                    IncrementColorFlipCount(sibling.Left.Color, parent.Color);
-                                    sibling.Left.Color = parent.Color;
-                                }
-                                newParent = LRRotation(parent);
+                                // right left
+                                newParent = RLRotation(parent);
                             }
                         }
                         else
@@ -383,21 +373,11 @@ namespace GatorLibrary.Structures.RedBlackTree
                             if (sibling == parent.Left)
                             {
                                 // left right
-                                if (sibling.Right != null)
-                                {
-                                    IncrementColorFlipCount(sibling.Right.Color, parent.Color);
-                                    sibling.Right.Color = parent.Color;
-                                }
                                 newParent = LRRotation(parent);
                             }
                             else
                             {
                                 // Right Right
-                                if (sibling.Right != null)
-                                {
-                                    IncrementColorFlipCount(sibling.Right.Color, sibling.Color);
-                                    sibling.Right.Color = sibling.Color;
-                                }
                                 newParent = RRRotation(parent);
                             }
                         }

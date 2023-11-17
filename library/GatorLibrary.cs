@@ -29,11 +29,11 @@ namespace GatorLibrary
             }
             catch (KeyNotFoundException)
             {
-                return "BookID not found in the Library.";
+                return $"Book {bookId} not found in the Library.";
             }
             catch (ApplicationException)
             {
-                return "BookID not found in the Library.";
+                return $"Book {bookId} not found in the Library.";
             }
         }
 
@@ -132,12 +132,17 @@ namespace GatorLibrary
                 string output = $"Book {bookId} is no longer available.";
                 if (deletedBook.ReservationHeap.GetRoot() != null)
                 {
-                    output += $" Reservations made by patrons ";
                     List<int> reservedPatrons = new();
                     while (deletedBook.ReservationHeap.GetRoot() != null)
                     {
                         reservedPatrons.Add(deletedBook.ReservationHeap.RemoveMin().Data);
                     }
+                    if (reservedPatrons.Count == 1)
+                    {
+                        output += $" Reservation made by patron {reservedPatrons.FirstOrDefault()} has been cancelled!";
+                        return output;
+                    }
+                    output += $" Reservations made by patrons ";
                     output += string.Join(", ", reservedPatrons);
                     output += " have been cancelled!";
                 }
