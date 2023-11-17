@@ -30,12 +30,12 @@ namespace GatorLibrary.Structures.RedBlackTree
     public class RedBlackTree<T> where T : IComparable
     {
         public Node<T>? Root { get; set; }
-        public int FlipCount { get; set; }
+        public int ColorFlipCount { get; set; }
 
         public RedBlackTree(Node<T>? root)
         {
             Root = root ?? null;
-            FlipCount = 0;
+            ColorFlipCount = 0;
         }
 
         #region Primary Methods
@@ -159,6 +159,7 @@ namespace GatorLibrary.Structures.RedBlackTree
                     else if (vSibling != null)
                     {
                         // Make sibling red
+                        IncrementColorFlipCount(vSibling.Color, NodeColor.Red);
                         vSibling.Color = NodeColor.Red;
                     }
                     if (vParent != null)
@@ -206,6 +207,7 @@ namespace GatorLibrary.Structures.RedBlackTree
                     else
                     {
                         // u or v red, color u black
+                        IncrementColorFlipCount(u.Color, NodeColor.Black);
                         u.Color = NodeColor.Black;
                     }
                 }
@@ -251,6 +253,7 @@ namespace GatorLibrary.Structures.RedBlackTree
                     else if (vSibling != null)
                     {
                         // Make sibling red
+                        IncrementColorFlipCount(vSibling.Color, NodeColor.Red);
                         vSibling.Color = NodeColor.Red;
                     }
                     if (vParent != null)
@@ -298,6 +301,7 @@ namespace GatorLibrary.Structures.RedBlackTree
                     else
                     {
                         // u or v red, color u black
+                        IncrementColorFlipCount(u.Color, NodeColor.Black);
                         u.Color = NodeColor.Black;
                     }
                 }
@@ -358,6 +362,7 @@ namespace GatorLibrary.Structures.RedBlackTree
                                 // left left
                                 if (sibling.Left != null)
                                 {
+                                    IncrementColorFlipCount(sibling.Left.Color, sibling.Color);
                                     sibling.Left.Color = sibling.Color;
                                 }
                                 newParent = LLRotation(parent);
@@ -367,6 +372,7 @@ namespace GatorLibrary.Structures.RedBlackTree
                                 // left right
                                 if (sibling.Left != null)
                                 {
+                                    IncrementColorFlipCount(sibling.Left.Color, parent.Color);
                                     sibling.Left.Color = parent.Color;
                                 }
                                 newParent = LRRotation(parent);
@@ -379,6 +385,7 @@ namespace GatorLibrary.Structures.RedBlackTree
                                 // left right
                                 if (sibling.Right != null)
                                 {
+                                    IncrementColorFlipCount(sibling.Right.Color, parent.Color);
                                     sibling.Right.Color = parent.Color;
                                 }
                                 newParent = LRRotation(parent);
@@ -388,11 +395,13 @@ namespace GatorLibrary.Structures.RedBlackTree
                                 // Right Right
                                 if (sibling.Right != null)
                                 {
+                                    IncrementColorFlipCount(sibling.Right.Color, sibling.Color);
                                     sibling.Right.Color = sibling.Color;
                                 }
                                 newParent = RRRotation(parent);
                             }
                         }
+                        IncrementColorFlipCount(parent.Color, NodeColor.Black);
                         parent.Color = NodeColor.Black;
                         if (grandparent != null)
                         {
@@ -402,11 +411,15 @@ namespace GatorLibrary.Structures.RedBlackTree
                     else
                     {
                         // 2 black children
+                        IncrementColorFlipCount(sibling.Color, NodeColor.Red);
                         sibling.Color = NodeColor.Red;
                         if (parent.Color == NodeColor.Black)
                             FixDoubleBlack(pathToNode.SkipLast(1).ToList());
                         else
+                        {
+                            IncrementColorFlipCount(parent.Color, NodeColor.Black);
                             parent.Color = NodeColor.Black;
+                        }
                     }
                 }
             }
@@ -597,14 +610,16 @@ namespace GatorLibrary.Structures.RedBlackTree
                 }
                 else
                 {
-                    FlipCount++;
                     // Recolor parent, sibling to black, grandparent to red if it's not the root
+                    IncrementColorFlipCount(parentSibling.Color, NodeColor.Black);
+                    IncrementColorFlipCount(parent.Color, NodeColor.Black);
                     parentSibling.Color = NodeColor.Black;
                     parent.Color = NodeColor.Black;
                     if (grandParent == Root)
                     {
                         break;
                     }
+                    IncrementColorFlipCount(grandParent.Color, NodeColor.Red);
                     grandParent.Color = NodeColor.Red;
                     path = path.SkipLast(2).ToList();
                 }
@@ -661,6 +676,13 @@ namespace GatorLibrary.Structures.RedBlackTree
             return InorderTraversal(searchValue1, searchValue2, root.Right, traversedPath);
         }
 
+        private void IncrementColorFlipCount(NodeColor oldNodeColor, NodeColor newNodeColor)
+        {
+            if (newNodeColor != oldNodeColor)
+            {
+                ColorFlipCount++;
+            }
+        }
         #region Rotation Methods
         private Node<T> LLRotation(Node<T> node)
         {
@@ -672,6 +694,8 @@ namespace GatorLibrary.Structures.RedBlackTree
             NodeColor newNodeColor = left.Color;
             Node<T>? temp = left.Right;
             left.Right = node;
+            IncrementColorFlipCount(left.Color, node.Color);
+            IncrementColorFlipCount(node.Color, newNodeColor);
             left.Color = node.Color;
             node.Color = newNodeColor;
             if (Root == node)
@@ -692,6 +716,8 @@ namespace GatorLibrary.Structures.RedBlackTree
             NodeColor newNodeColor = right.Color;
             Node<T>? temp = right.Left;
             right.Left = node;
+            IncrementColorFlipCount(right.Color, node.Color);
+            IncrementColorFlipCount(node.Color, newNodeColor);
             right.Color = node.Color;
             node.Color = newNodeColor;
             if (Root == node)
@@ -719,6 +745,8 @@ namespace GatorLibrary.Structures.RedBlackTree
             left.Right = leftRight.Left;
             leftRight.Left = left;
             leftRight.Right = node;
+            IncrementColorFlipCount(leftRight.Color, node.Color);
+            IncrementColorFlipCount(node.Color, newNodeColor);
             leftRight.Color = node.Color;
             node.Color = newNodeColor;
             if (Root == node)
@@ -745,6 +773,8 @@ namespace GatorLibrary.Structures.RedBlackTree
             rightLeft.Right = right;
             node.Right = rightLeft.Left;
             rightLeft.Left = node;
+            IncrementColorFlipCount(rightLeft.Color, node.Color);
+            IncrementColorFlipCount(node.Color, newNodeColor);
             rightLeft.Color = node.Color;
             node.Color = newNodeColor;
             if (Root == node)
