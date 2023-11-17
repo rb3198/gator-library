@@ -20,9 +20,9 @@ namespace GatorLibrary
                 string borrowedBy = book.BorrowedBy == 0 ? "None" : book.BorrowedBy.ToString();
                 return @$"
                 BookID = {book.BookId}
-                Title = {book.BookName}
-                Author = {book.AuthorName}
-                Availability = {book.AvailabilityStatus}
+                Title = ""{book.BookName}""
+                Author = ""{book.AuthorName}""
+                Availability = ""{book.AvailabilityStatus}""
                 BorrowedBy = {borrowedBy}
                 Reservations = {book.ReservationHeap.GetHeapData()}
                 ";
@@ -42,9 +42,9 @@ namespace GatorLibrary
             string borrowedBy = book.BorrowedBy == 0 ? "None" : book.BorrowedBy.ToString();
             return @$"
             BookID = {book.BookId}
-            Title = {book.BookName}
-            Author = {book.AuthorName}
-            Availability = {book.AvailabilityStatus}
+            Title = ""{book.BookName}""
+            Author = ""{book.AuthorName}""
+            Availability = ""{book.AvailabilityStatus}""
             BorrowedBy = {borrowedBy}
             Reservations = {book.ReservationHeap.GetHeapData()}
             ";
@@ -166,7 +166,7 @@ namespace GatorLibrary
 
         public string ColorFlipCount()
         {
-            return $"Color Flip Count: {BookTree.FlipCount}";
+            return $"Color Flip Count: {BookTree.ColorFlipCount}";
         }
     }
 }

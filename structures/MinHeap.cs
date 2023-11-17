@@ -3,9 +3,9 @@ namespace GatorLibrary.Structures.BinaryHeap
     public class Node<T>
     {
         public int PriorityNumber { get; set; }
-        public int TimeOfReservation { get; set; }
+        public DateTime TimeOfReservation { get; set; }
         public T? Data { get; set; }
-        public Node(T data, int priorityNumber, int timeOfReservation)
+        public Node(T data, int priorityNumber, DateTime timeOfReservation)
         {
             Data = data;
             PriorityNumber = priorityNumber;
@@ -25,7 +25,7 @@ namespace GatorLibrary.Structures.BinaryHeap
         }
         public void Add(T data, int priority)
         {
-            Node<T> node = new(data, priority, (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            Node<T> node = new(data, priority, DateTime.Now);
             Nodes.Add(node);
             if (Nodes.Count == 1)
             {
@@ -60,6 +60,10 @@ namespace GatorLibrary.Structures.BinaryHeap
             foreach (Node<T> node in Nodes)
             {
                 output += $"{node.Data?.ToString() ?? string.Empty}, ";
+            }
+            if (output.Length > 1)
+            {
+                output = output.Substring(0, output.Length - 2);
             }
             output += "]";
             return output;
