@@ -7,7 +7,7 @@ namespace GatorLibrary
         public int BookId { get; set; }
         public string BookName { get; set; }
         public string AuthorName { get; set; }
-        public string AvailabilityStatus { get; set; }
+        public string AvailabilityStatus { get => BorrowedBy == 0 ? "Yes" : "No"; }
         public int BorrowedBy { get; set; } // Patron ID of the Patron in possession of the book
         public MinBinaryHeap<int> ReservationHeap { get; set; }
 
@@ -16,7 +16,6 @@ namespace GatorLibrary
             BookId = bookId;
             BookName = bookName;
             AuthorName = authorName;
-            AvailabilityStatus = availabilityStatus;
             BorrowedBy = borrowedBy;
             ReservationHeap = new(null);
         }
