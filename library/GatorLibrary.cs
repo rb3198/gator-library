@@ -19,12 +19,12 @@ namespace GatorLibrary
                 Book book = bookNode.Data;
                 string borrowedBy = book.BorrowedBy == 0 ? "None" : book.BorrowedBy.ToString();
                 return @$"
-                BookID = {book.BookId}
-                Title = ""{book.BookName}""
-                Author = ""{book.AuthorName}""
-                Availability = ""{book.AvailabilityStatus}""
-                BorrowedBy = {borrowedBy}
-                Reservations = {book.ReservationHeap.GetHeapData()}
+BookID = {book.BookId}
+Title = ""{book.BookName}""
+Author = ""{book.AuthorName}""
+Availability = ""{book.AvailabilityStatus}""
+BorrowedBy = {borrowedBy}
+Reservations = {book.ReservationHeap.GetHeapData()}
                 ";
             }
             catch (KeyNotFoundException)
@@ -41,12 +41,12 @@ namespace GatorLibrary
         {
             string borrowedBy = book.BorrowedBy == 0 ? "None" : book.BorrowedBy.ToString();
             return @$"
-            BookID = {book.BookId}
-            Title = ""{book.BookName}""
-            Author = ""{book.AuthorName}""
-            Availability = ""{book.AvailabilityStatus}""
-            BorrowedBy = {borrowedBy}
-            Reservations = {book.ReservationHeap.GetHeapData()}
+BookID = {book.BookId}
+Title = ""{book.BookName}""
+Author = ""{book.AuthorName}""
+Availability = ""{book.AvailabilityStatus}""
+BorrowedBy = {borrowedBy}
+Reservations = {book.ReservationHeap.GetHeapData()}
             ";
         }
 
